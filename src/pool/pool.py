@@ -6,7 +6,6 @@ HOST = os.getenv("HOST")
 USER_DB = os.getenv("USER_DB")
 PASSWD = os.getenv("PASSWD")
 DB = os.getenv("DB")
-PORT = os.getenv("PORT")
 
 DATABASE_URL = f"postgresql+asyncpg://{USER_DB}:{PASSWD}@{HOST}/{DB}"
 
