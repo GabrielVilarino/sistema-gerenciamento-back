@@ -1,7 +1,14 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+import os
 
-DATABASE_URL = "postgresql+asyncpg://postgres:88070818@localhost/templaria"
+HOST = os.getenv("HOST")
+USER_DB = os.getenv("USER_DB")
+PASSWD = os.getenv("PASSWD")
+DB = os.getenv("DB")
+PORT = os.getenv("PORT")
+
+DATABASE_URL = f"postgresql+asyncpg://{USER_DB}:{PASSWD}@{HOST}/{DB}"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 
