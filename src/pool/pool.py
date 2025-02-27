@@ -8,7 +8,7 @@ PASSWD = os.getenv("PASSWD")
 DB = os.getenv("DB")
 
 DATABASE_URL = f"postgresql+asyncpg://{USER_DB}:{PASSWD}@{HOST}/{DB}"
-
+print(DATABASE_URL)
 engine = create_async_engine(DATABASE_URL, echo=True)
 
 async_session = sessionmaker(
