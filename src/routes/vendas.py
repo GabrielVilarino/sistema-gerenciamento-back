@@ -98,7 +98,6 @@ async def vendas(params: BuscaVendas | None = None, db: AsyncSession = Depends(g
             if params.cpf:
                 query = query.where(Vendas.cpf_cliente == params.cpf)
         
-        print(query)
         result = await db.execute(query)
         vendas = result.fetchall()
         
@@ -197,6 +196,10 @@ async def exportar_planilha(dados: list[dict]):
         df["socio"] = df["socio"].apply(lambda x: "Sim" if x else "Não")
 
         df = df.sort_values(by=["data da venda"], ascending=[False])
+
+        df = df[['matricula', 'vendedor', 'cliente', 'cpf do cliente', 'turma', 'socio', 'nome do produto',
+                 'tamanho', 'quantidade', 'data da venda', 'forma de pagamento', 'obs', 'valor pago', 'valor do produto',
+                 'troco']]
 
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
