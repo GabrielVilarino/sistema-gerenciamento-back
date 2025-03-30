@@ -17,7 +17,7 @@ async def add_produto(
     tamanho: str = Form(...),
     preco: float = Form(...),
     preco_socio: float = Form(...),
-    quantidade: int = Form(...),
+    disponivel: bool = Form(...),
     imagem: UploadFile = File(...),
     db: AsyncSession = Depends(get_db)
 ):
@@ -37,7 +37,7 @@ async def add_produto(
             tamanho = tamanho,
             preco = preco,
             preco_socio = preco_socio,
-            quantidade = quantidade,
+            disponivel = disponivel,
             image_url = image_url,
             categoria_id = int(categoria_id)
         )
@@ -83,7 +83,7 @@ async def produtos(params: BuscaProduto | None = None, db: AsyncSession = Depend
                 "tamanho": produto[0].tamanho,
                 "preco": produto[0].preco,
                 "preco_socio": produto[0].preco_socio,
-                "quantidade": produto[0].quantidade,
+                "disponivel": produto[0].disponivel,
                 "image_url": produto[0].image_url,
                 "categoria": produto[1],
             }
@@ -119,7 +119,7 @@ async def produto(codigo: int, db: AsyncSession = Depends(get_db)):
             "tamanho": produto.tamanho,
             "preco": produto.preco,
             "preco_socio": produto.preco_socio,
-            "quantidade": produto.quantidade,
+            "disponivel": produto.disponivel,
             "image_url": produto.image_url,
             "categoria_id": produto.categoria_id
         }
@@ -145,7 +145,7 @@ async def update_produto(
     tamanho: str = Form(...),
     preco: float = Form(...),
     preco_socio: float = Form(...),
-    quantidade: int = Form(...),
+    disponivel: bool = Form(...),
     imagem_url: str = Form(...),
     imagem: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db)
@@ -160,7 +160,7 @@ async def update_produto(
                                                                                 tamanho=tamanho,
                                                                                 preco=preco,
                                                                                 preco_socio=preco_socio,
-                                                                                quantidade=quantidade)
+                                                                                disponivel=disponivel)
 
         if imagem:
             
@@ -179,7 +179,7 @@ async def update_produto(
                                                                                     tamanho=tamanho,
                                                                                     preco=preco,
                                                                                     preco_socio=preco_socio,
-                                                                                    quantidade=quantidade,
+                                                                                    disponivel=disponivel,
                                                                                     image_url=image_url)
 
         

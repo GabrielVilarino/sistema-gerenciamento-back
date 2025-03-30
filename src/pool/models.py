@@ -44,7 +44,7 @@ class Produtos(Base):
     tamanho = Column(String(3), nullable=False)
     preco = Column(Float, nullable=False)
     preco_socio = Column(Float, nullable=False)
-    quantidade = Column(Integer, nullable=False)
+    disponivel = Column(Boolean, nullable=False)
     image_url = Column(String(255), nullable=False)
 
     categoria_id = Column(Integer, ForeignKey("public.categorias.id"), nullable=False)

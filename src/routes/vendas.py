@@ -30,13 +30,12 @@ async def add_venda(params: InputVendas, db: AsyncSession = Depends(get_db)):
             )
             result_produto = await db.execute(query_produto)
             estoque_produto = result_produto.scalar_one_or_none()
-            print(f"Query: {query_produto}")
             
             if estoque_produto is None:
                 raise HTTPException(status_code=404, detail=f"Produto {produto.nome_produto} com o tamanho: {produto.tamanho} não encontrado.")
             
-            if estoque_produto.quantidade < produto.quantidade:
-                raise HTTPException(status_code=400, detail=f"Estoque insuficiente para o produto {estoque_produto.nome} no tamanho: {produto.tamanho}, quantidade atual: {estoque_produto.quantidade}.")
+            # if estoque_produto.quantidade < produto.quantidade:
+            #     raise HTTPException(status_code=400, detail=f"Estoque insuficiente para o produto {estoque_produto.nome} no tamanho: {produto.tamanho}, quantidade atual: {estoque_produto.quantidade}.")
                 
             new_venda = Vendas(
                 matricula=params.matricula,
@@ -56,9 +55,9 @@ async def add_venda(params: InputVendas, db: AsyncSession = Depends(get_db)):
             )
             db.add(new_venda)
 
-            estoque_produto.quantidade -= produto.quantidade
+            # estoque_produto.quantidade -= produto.quantidade
 
-            db.add(estoque_produto)
+            # db.add(estoque_produto)
         
 
         await db.commit()
@@ -152,21 +151,11 @@ async def delete_venda(id_venda: int, db: AsyncSession = Depends(get_db)):
         if not venda:
             raise HTTPException(status_code=404, detail="Venda não encontrada.")
 
-        query_produto = select(Produtos).where(Produtos.codigo == venda.codigo_produto)
-        result_produto = await db.execute(query_produto)
-        produto = result_produto.scalar_one_or_none()
-
-        if not produto:
-            raise HTTPException(status_code=404, detail="Produto não encontrado.")
-
-        produto.quantidade += venda.quantidade
-        await db.commit()
-
         delete_query = delete(Vendas).where(Vendas.id == id_venda)
         await db.execute(delete_query)
         await db.commit()
 
-        return {"detail": "Venda excluída com sucesso e estoque atualizado."}
+        return {"detail": "Venda excluída com sucesso."}
 
     except HTTPException as e:
         print(e)
