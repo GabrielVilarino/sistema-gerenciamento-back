@@ -73,7 +73,6 @@ class ProdutoVenda(BaseModel):
 class InputVendas(BaseModel):
     matricula: int
     nome_cliente: str
-    cpf_cliente: str
     turma: Optional[str] = None
     socio: bool
     data_venda: str

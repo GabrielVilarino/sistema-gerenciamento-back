@@ -70,7 +70,6 @@ class Vendas(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     matricula = Column(BigInteger, ForeignKey("public.usuarios.matricula"), nullable=False)
     nome_cliente = Column(String(255), nullable=False)
-    cpf_cliente = Column(String(13), nullable=False)
     turma = Column(String(10), nullable=True)
     socio = Column(Boolean, nullable=False)
     codigo_produto = Column(Integer, ForeignKey("public.produtos.codigo"), nullable=False)

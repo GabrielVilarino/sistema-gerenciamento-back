@@ -40,7 +40,6 @@ async def add_venda(params: InputVendas, db: AsyncSession = Depends(get_db)):
             new_venda = Vendas(
                 matricula=params.matricula,
                 nome_cliente = params.nome_cliente,
-                cpf_cliente=params.cpf_cliente,
                 turma=params.turma,
                 socio=params.socio,
                 codigo_produto=produto.codigo_produto,
@@ -109,7 +108,6 @@ async def vendas(params: BuscaVendas | None = None, db: AsyncSession = Depends(g
                 "matricula": venda[0].matricula,
                 "usuario_nome": venda[2],
                 "nome_cliente": venda[0].nome_cliente,
-                "cpf_cliente": venda[0].cpf_cliente,
                 "turma": venda[0].turma,
                 "socio": venda[0].socio,
                 "codigo_produto": venda[0].codigo_produto,
@@ -176,7 +174,7 @@ async def exportar_planilha(dados: list[dict]):
 
         df = pd.DataFrame(dados)
         
-        df = df.rename(columns={"usuario_nome": "vendedor", "nome_cliente": "cliente", "cpf_cliente": "cpf do cliente",
+        df = df.rename(columns={"usuario_nome": "vendedor", "nome_cliente": "cliente",
                                 "produto_nome": "nome do produto", "data_venda": "data da venda", "forma_pagamento": "forma de pagamento",
                                 "valor_pago": "valor pago", "valor_produto": "valor do produto"})
         
@@ -186,7 +184,7 @@ async def exportar_planilha(dados: list[dict]):
 
         df = df.sort_values(by=["data da venda"], ascending=[False])
 
-        df = df[['matricula', 'vendedor', 'cliente', 'cpf do cliente', 'turma', 'socio', 'nome do produto',
+        df = df[['matricula', 'vendedor', 'cliente', 'turma', 'socio', 'nome do produto',
                  'tamanho', 'quantidade', 'data da venda', 'forma de pagamento', 'obs', 'valor pago', 'valor do produto',
                  'troco']]
 
