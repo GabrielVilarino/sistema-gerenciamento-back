@@ -1,8 +1,10 @@
-from fastapi import FastAPI
-from src.routes import login, users, cargos, produtos, categorias, vendas
 from dotenv import load_dotenv
 
 load_dotenv()
+
+from fastapi import FastAPI
+from src.routes import login, users, cargos, produtos, categorias, vendas
+
 
 app = FastAPI()
 
