@@ -61,7 +61,7 @@ class UpdateProduto(BaseModel):
 class BuscaVendas(BaseModel):
     data_inicio: Optional[str] = None
     data_fim: Optional[str] = None
-    cpf: Optional[str] = None
+    status: Optional[bool] = None
 
 class ProdutoVenda(BaseModel):
     codigo_produto: int
@@ -81,3 +81,6 @@ class InputVendas(BaseModel):
     valor_pago: float
     produtos: List[ProdutoVenda]
     troco: float
+
+class UpdateStatus(BaseModel):
+    status: bool

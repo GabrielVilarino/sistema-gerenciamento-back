@@ -81,6 +81,7 @@ class Vendas(Base):
     troco = Column(Float(10,2), nullable=True)
     quantidade = Column(Integer, nullable=False)
     tamanho = Column(String, nullable=False)
+    status = Column(Boolean, nullable=False)
 
     produto = relationship("Produtos", back_populates="vendas")
     usuario = relationship("Usuarios", back_populates="vendas")

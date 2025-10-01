@@ -3,9 +3,9 @@ from sqlalchemy import cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
-from src.models import InputVendas
+from src.models import InputVendas, UpdateStatus
 from src.pool.pool import get_db
-from src.pool.models import Vendas, Produtos, Usuarios
+from src.pool.models import Vendas, Produtos, Usuarios, Categorias
 from src.models import BuscaVendas
 from datetime import datetime
 import pandas as pd
@@ -82,9 +82,12 @@ async def vendas(params: BuscaVendas | None = None, db: AsyncSession = Depends(g
         query = select(
             Vendas,
             Produtos.nome.label("produto_nome"),
-            Usuarios.nome.label("usuario_nome")
+            Usuarios.nome.label("usuario_nome"),
+            Categorias.nome.label("nome")
         ).join(Produtos, Vendas.codigo_produto == Produtos.codigo) \
-         .join(Usuarios, Vendas.matricula == Usuarios.matricula)
+         .join(Usuarios, Vendas.matricula == Usuarios.matricula) \
+         .join(Categorias, Produtos.categoria_id == Categorias.id) \
+         .order_by(Vendas.data_venda.desc())
 
         if params:
             if params.data_inicio:
@@ -93,8 +96,8 @@ async def vendas(params: BuscaVendas | None = None, db: AsyncSession = Depends(g
             if params.data_fim:
                 data_fim = datetime.strptime(params.data_fim, "%Y-%m-%d").date()
                 query = query.where(Vendas.data_venda <= cast(data_fim, Date))
-            if params.cpf:
-                query = query.where(Vendas.cpf_cliente == params.cpf)
+            if params.status is not None:
+                query = query.where(Vendas.status == params.status)
         
         result = await db.execute(query)
         vendas = result.fetchall()
@@ -112,6 +115,7 @@ async def vendas(params: BuscaVendas | None = None, db: AsyncSession = Depends(g
                 "socio": venda[0].socio,
                 "codigo_produto": venda[0].codigo_produto,
                 "produto_nome": venda[1],
+                "categoria": venda[3],
                 "data_venda": venda[0].data_venda.strftime("%Y-%m-%d"),
                 "forma_pagamento": venda[0].forma_pagamento,
                 "obs": venda[0].obs,
@@ -119,7 +123,8 @@ async def vendas(params: BuscaVendas | None = None, db: AsyncSession = Depends(g
                 "valor_produto": venda[0].valor_produto,
                 "troco": venda[0].troco,
                 "quantidade": venda[0].quantidade,
-                "tamanho": venda[0].tamanho
+                "tamanho": venda[0].tamanho,
+                "status": venda[0].status
             }
             for venda in vendas
         ]
@@ -135,6 +140,24 @@ async def vendas(params: BuscaVendas | None = None, db: AsyncSession = Depends(g
         print(f"Erro ao buscar vendas: {e}")
         raise HTTPException(status_code=500, detail="Erro ao buscar vendas")
     
+
+@router.put("/update-status/{id_venda}")
+async def update_status(id_venda: int, payload: UpdateStatus, db: AsyncSession = Depends(get_db)):
+    """
+    Rota para atualizar o status de uma venda.
+    """
+
+    try:
+        query = update(Vendas).where(Vendas.id == id_venda).values(status=payload.status)
+        
+        await db.execute(query)
+        await db.commit()
+
+        return {"detail": "Status atualizado com sucesso."}
+    
+    except Exception as e:
+        print(f"Erro ao atualizar status: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao atualizar status")
 
 @router.delete("/delete-venda")
 async def delete_venda(id_venda: int, db: AsyncSession = Depends(get_db)):
@@ -181,12 +204,13 @@ async def exportar_planilha(dados: list[dict]):
         df = df.drop(columns=["codigo_produto", "id"])
 
         df["socio"] = df["socio"].apply(lambda x: "Sim" if x else "Não")
+        df["status"] = df["status"].apply(lambda x: "ENTREGUE" if x else "PENDENTE")
 
-        df = df.sort_values(by=["data da venda"], ascending=[False])
+        df = df.sort_values(by=["categoria", "data da venda"], ascending=[True, False])
 
         df = df[['matricula', 'vendedor', 'cliente', 'turma', 'socio', 'nome do produto',
-                 'tamanho', 'quantidade', 'data da venda', 'forma de pagamento', 'obs', 'valor pago', 'valor do produto',
-                 'troco']]
+                 'tamanho', 'quantidade', 'categoria', 'data da venda', 'forma de pagamento', 'obs', 'valor pago', 'valor do produto',
+                 'troco', 'status']]
 
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
