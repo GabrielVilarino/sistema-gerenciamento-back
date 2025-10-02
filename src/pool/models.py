@@ -1,6 +1,6 @@
 # models.py
 
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, BigInteger, Date
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, BigInteger, Date, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ENUM
@@ -81,7 +81,7 @@ class Vendas(Base):
     troco = Column(Float(10,2), nullable=True)
     quantidade = Column(Integer, nullable=False)
     tamanho = Column(String, nullable=False)
-    status = Column(Boolean, nullable=False)
+    status = Column(Boolean, nullable=False, server_default=text("false"))
 
     produto = relationship("Produtos", back_populates="vendas")
     usuario = relationship("Usuarios", back_populates="vendas")
